@@ -54,7 +54,7 @@ export default function AuthPage() {
           {/* Toggle button */}
           <Button
             onClick={() => setShowLogin(!showLogin)}
-            sx={{
+            sx={{ 
               mt: 2,
               textTransform: "none",
               color: "green.900",
