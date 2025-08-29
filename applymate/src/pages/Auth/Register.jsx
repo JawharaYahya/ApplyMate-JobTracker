@@ -1,80 +1,91 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
-import { auth, db } from "../../firebase";
-import { doc, setDoc } from "firebase/firestore";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { Box, Typography, TextField, Button, Alert } from '@mui/material';
 
-export default function Register() {
+export default function Register({ handleRegister }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-    const navigate= useNavigate();
-  const firebaseErrorMessages = {
-    "auth/email-already-in-use": "This email is already registered",
-    "auth/invalid-email": "Please enter a valid email address",
-    "auth/weak-password": "Password must be at least 6 characters",
-    "auth/user-not-found": "No account found with this email",
-    "auth/wrong-password": "Incorrect password",
-    "auth/too-many-requests": "Too many attempts. Try again later",
-    "auth/user-disabled": "This account has been disabled",
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    try {
-      const userCredtianls = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      const user = userCredtianls.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        username,
-        email,
-      });
-      Swal.fire({
-        title: "Registration Successful",
-        icon: "success",
-        draggable: true,
-
-      });
-      navigate('/dashboard');
-    } catch (error) {
-      const erroMsg = firebaseErrorMessages[error.code];
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: erroMsg,
-        footer: '<a href="#">Why do I have this issue?</a>',
-      });
-       console.error(error);
-    }
-  };
+  const [error, setError] = useState("");
 
   return (
-    <form onSubmit={handleRegister}>
-      <input
-        type="text"
-        placeholder="Username"
+    <Box
+      component="form"
+      onSubmit={handleRegister}
+      sx={{
+        width: '100%',
+        maxWidth: 400, // same wider width
+        bgcolor: '#a5d6a7',
+        p: 4,
+        borderRadius: 2,
+        boxShadow: 3,
+        transition: 'transform 0.3s, box-shadow 0.3s',
+        '&:hover': {
+          transform: 'translateY(-5px)',
+          boxShadow: 6,
+        },
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: 380,
+      }}
+    >
+      <Typography variant="h6" gutterBottom textAlign="center" color="green.900">
+        Register
+      </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 1 }}>
+          {error}
+        </Alert>
+      )}
+
+      <TextField
+        margin="dense"
+        required
+        fullWidth
+        id="username"
+        label="Username"
+        name="username"
+        autoComplete="username"
+        autoFocus
+        value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
-      <input
-        type="email"
-        placeholder="Email"
+      <TextField
+        margin="dense"
+        required
+        fullWidth
+        id="email"
+        label="Email"
+        name="email"
+        autoComplete="email"
+        value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      <input
+      <TextField
+        margin="dense"
+        required
+        fullWidth
+        name="password"
+        label="Password"
         type="password"
-        placeholder="Password"
+        id="password"
+        autoComplete="current-password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-
-      <button type="submit">Register</button>
-    </form>
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        sx={{
+          mt: 2,
+          bgcolor: 'green.700',
+          '&:hover': { bgcolor: 'green.900' },
+        }}
+      >
+        Sign Up
+      </Button>
+    </Box>
   );
 }
