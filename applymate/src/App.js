@@ -1,38 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
-import Register from './pages/Auth/Register';
-import { BrowserRouter ,Routes,Route} from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { onAuthStateChanged } from "firebase/auth";
+import { useDispatch } from "react-redux";  
 import { auth } from "./firebase";
+import ProtectedRoute from "./Routes/ProtectedRoutes";
+import Admin from "./pages/Admin";
 import Navbar from './componants/navBar/Navbar';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
-import { useEffect, useState } from 'react';
+import Register from './pages/Auth/Register';
 import Login from './pages/Auth/Login';
-function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-   useEffect(() => {
+import { setUser, clearUser } from "./pages/redux/userSlice";
+
+
+export default function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user); 
+      if (user) {
+        dispatch(setUser({
+          uid: user.uid,
+          email: user.email,
+          role: "user", 
+        }));
+      } else {
+        dispatch(clearUser());
+      }
     });
 
-    return () => unsubscribe(); 
-  }, []);
-   
+    return () => unsubscribe();
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
-     <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
-<Routes>
-  <Route path='/' element={<Home/>}/>
-  <Route path='/register' element={<Register/>}/>
-  <Route path='/dashboard' element={<Dashboard/>}/>
-  <Route path='/profile' element={<Profile/>}/>
-  <Route path='/login' element={<Login/>}/>
-</Routes>
-</BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Login />} />
+        <Route 
+  path="/admin" 
+  element={
+    <ProtectedRoute>
+      <Admin />
+    </ProtectedRoute>
+  } 
+/>
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;

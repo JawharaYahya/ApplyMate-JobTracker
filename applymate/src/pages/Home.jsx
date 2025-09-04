@@ -1,72 +1,87 @@
-import { useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
-import Login from "./Auth/Login";
-import Register from "./Auth/Register";
+import React, { useState, useEffect } from "react";
+import { Container, Typography, Button, Box } from "@mui/material";
+import { Link } from "react-router-dom";
+import { auth } from "../firebase";
 
-export default function AuthPage() {
-  const [showLogin, setShowLogin] = useState(false);
+import { onAuthStateChanged } from "firebase/auth";
+export default function Home() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#e8f5e9",
+        bgcolor: "#9FFFCB", // mint background
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
         p: 2,
       }}
     >
-      <Typography
-        variant="h4"
-        gutterBottom
-        textAlign="center"
-        color="green.800"
+      <Container
+        maxWidth="sm"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          background: "linear-gradient(to bottom right, #7AE582, #00A5CF)",
+          borderRadius: 3,
+          boxShadow: 3,
+          p: 4,
+        }}
       >
-        Welcome to ApplyMate
-      </Typography>
-
-      <Box sx={{ mt: 3 }}>
-        {/* Wrap form and subtitle together */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+        <Typography
+          variant="h2"
+          gutterBottom
+          sx={{ fontWeight: "bold", color: "#004E64" }}
         >
-          {/* Subtitle inside the card wrapper */}
-          <Typography
-            variant="body1"
-            textAlign="center"
-            color="green.900"
-            sx={{ mb: 2 }}
-          >
-            {showLogin
-              ? "Login to your account"
-              : "Register to create your account"}
-          </Typography>
+          Job Tracker
+        </Typography>
 
-          {/* The form itself */}
-          {showLogin ? <Login /> : <Register />}
+        <Typography
+          variant="h6"
+          sx={{ mb: 4, color: "#004E64" }}
+        >
+          Keep track of your job applications and update their status anytime.
+          Use your dashboard to manage statuses and stay on top of your career journey.
+        </Typography>
 
-          {/* Toggle button */}
-          <Button
-            onClick={() => setShowLogin(!showLogin)}
-            sx={{ 
-              mt: 2,
-              textTransform: "none",
-              color: "green.900",
-              fontWeight: "bold",
-            }}
-          >
-            {showLogin
-              ? "Don't have an account? Sign Up"
-              : "Already have an account? Sign In"}
-          </Button>
-        </Box>
-      </Box>
+        {!user && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              component={Link}
+              to="/login"
+              variant="contained"
+              sx={{
+                bgcolor: "#25A18E",
+                "&:hover": { bgcolor: "#004E64" },
+              }}
+            >
+              Login
+            </Button>
+            <Button
+              component={Link}
+              to="/register"
+              variant="outlined"
+              sx={{
+                color: "#25A18E",
+                borderColor: "#25A18E",
+                "&:hover": { bgcolor: "#7AE582" },
+              }}
+            >
+              Register
+            </Button>
+          </Box>
+        )}
+      </Container>
     </Box>
   );
 }

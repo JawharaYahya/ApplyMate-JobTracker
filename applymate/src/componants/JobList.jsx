@@ -1,74 +1,98 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateJob } from "../redux/jobSlice";
-import { updateJobInFirestore } from "../redux/jobServices";
-import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
+import { updateJob } from "../pages/redux/jobSlice";
+import { updateJobInFirestore } from "../pages/redux/jobServices";
+import { FormControl, Select, MenuItem, Box, Paper, Typography } from "@mui/material";
 
 function JobList() {
-const jobs = useSelector((state) => state.job.jobs);
+  const jobs = useSelector((state) => state.job.jobs);
   const dispatch = useDispatch();
 
   const handleUpdate = async (id, newStatus) => {
-    const updatedData = { status: newStatus }; 
+    const updatedData = { status: newStatus };
     try {
-      await updateJobInFirestore(id, updatedData); 
-      dispatch(updateJob({ id, updatedData })); 
+      await updateJobInFirestore(id, updatedData);
+      dispatch(updateJob({ id, updatedData }));
     } catch (error) {
       console.error("Error updating job:", error);
     }
   };
 
-  const statusOptions = ["Applied", "Interview", "Rejected", "Hired"];
-
-  // ألوان لكل حالة
+  const statusOptions = ["applied", "interview", "rejected", "hired"];
   const statusColors = {
-    Applied: "#2196f3", 
-    Interview: "#ff9800",
-    Rejected: "#f44336", 
-    Hired: "#4caf50"      
+    applied: "#81c784",
+    interview: "#ffb74d",
+    rejected: "#e57373",
+    hired: "#4caf50",
   };
 
   return (
-    <Box sx={{ padding: "20px" }}>
-      <h2>Job List</h2>
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: 4, 
+        mt: 3,
+        width: '100%',
+        px: 3,
+        fontFamily: "'Roboto', sans-serif" ,
+      }}
+    >
       {jobs.map((job) => (
-        <Box 
+        <Paper 
           key={job.id} 
+          elevation={3} 
           sx={{ 
-            marginBottom: "20px", 
-            border: "1px solid #ddd", 
-            padding: "10px", 
-            borderRadius: "8px",
-            backgroundColor: "#f9f9f9" 
+            p: 4, 
+            width: 300, // slightly bigger box
+            minHeight: 180, // proportional height
+            borderRadius: 3, 
+            backgroundColor: '#dcedc8', 
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
           }}
         >
-          <p>
-            {job.title} -{" "}
-            <span style={{ color: statusColors[job.status], fontWeight: "bold" }}>
-              {job.status}
-            </span>
-          </p>
+          <Typography variant="subtitle1" sx={{ mb: 2, color: '#2e7d32' }}>
+            {`Company Name: ${job.company || 'N/A'}`}
+            </Typography>
 
-          <FormControl fullWidth variant="outlined" size="small">
-            <InputLabel id={`status-label-${job.id}`}>Status</InputLabel>
+            <Typography variant="subtitle1" sx={{ mb: 2, color: '#2e7d32' }}>
+            {`Position: ${job.position || 'N/A'}`}
+            </Typography>
+         
+             <Typography variant="subtitle1" sx={{ mb: 2, color: '#2e7d32' }}>
+            {`Note: ${job.notes || ''}`}
+          </Typography>
+          <FormControl fullWidth sx={{ mt: 'auto' }}>
             <Select
-              labelId={`status-label-${job.id}`}
-              value={job.status}
-              label="Status"
+              value={job.status || 'applied'}
               onChange={(e) => handleUpdate(job.id, e.target.value)}
+              displayEmpty
+              sx={{
+                fontWeight: 'bold',
+                color: statusColors[job.status] || '#000',
+                fontSize: 14,
+              }}
+              renderValue={(selected) => (
+                <span style={{ color: statusColors[selected] || '#000', fontWeight: 'bold' }}>
+                  {selected.charAt(0).toUpperCase() + selected.slice(1)}
+                </span>
+              )}
             >
               {statusOptions.map((status) => (
-                <MenuItem
-                  key={status}
-                  value={status}
-                  sx={{ color: statusColors[status], fontWeight: "bold" }}
+                <MenuItem 
+                  key={status} 
+                  value={status} 
+                  sx={{ color: statusColors[status], fontWeight: 'bold' }}
                 >
-                  {status}
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Box>
+        </Paper>
       ))}
     </Box>
   );
