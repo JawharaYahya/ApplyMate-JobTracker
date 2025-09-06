@@ -6,6 +6,7 @@ import JobForm from "../componants/JobForm";
 import JobList from "../componants/JobList";
 import { Box, Button, Typography } from "@mui/material";
 import {auth } from "../firebase";
+import ChatBot from "../componants/ChatBot";
 
 export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
@@ -89,10 +90,10 @@ export default function Dashboard() {
     </Box>
   )}
 
-
   <Box sx={{ width: '90%', maxWidth: 900 }}>
     <JobList palette={{ header: '#25A18E', row: '#00A5CF', alternateRow: '#7AE582', text: '#004E64' }} />
   </Box>
+    <ChatBot/>
 </Box>
 
   );

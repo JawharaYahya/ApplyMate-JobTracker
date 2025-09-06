@@ -51,7 +51,9 @@ export default function App() {
     </ProtectedRoute>
   } 
 />
+
       </Routes>
+        
     </BrowserRouter>
   );
 }
