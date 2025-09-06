@@ -79,6 +79,7 @@ export default function Home() {
             >
               Register
             </Button>
+          
           </Box>
         )}
       </Container>
